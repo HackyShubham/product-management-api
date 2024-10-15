@@ -4,6 +4,7 @@ import com.example.product.dto.ProductDto;
 import com.example.product.service.ProductService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -37,7 +38,7 @@ public class ProductResource {
     @POST
     //@WithTransaction
     //@Transactional
-    public Uni<Response> createProduct(ProductDto productDto) {
+    public Uni<Response> createProduct(@Valid ProductDto productDto) {
         return productService.createProduct(productDto)
                 .onItem().transform(productResponse -> Response
                         .status(CREATED) // Set the response status to 201
@@ -48,7 +49,7 @@ public class ProductResource {
     // Update an existing product
     @PUT
     @Path("/{id}")
-    public Uni<Response> updateProduct(@PathParam("id") Long id, ProductDto productDto) {
+    public Uni<Response> updateProduct(@PathParam("id") Long id,@Valid ProductDto productDto) {
         return productService.updateProduct(id,productDto)
                 .onItem().transform(updatedProduct -> Response.ok(updatedProduct).build())
                 .onFailure().recoverWithItem(th -> Response.status(Response.Status.NOT_FOUND).build());

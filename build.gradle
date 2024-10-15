@@ -17,6 +17,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-resteasy-reactive'
     implementation 'io.quarkus:quarkus-arc'
     implementation 'org.mapstruct:mapstruct:1.6.0'
+    implementation 'org.hibernate.validator:hibernate-validator'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
 
@@ -25,6 +26,8 @@ dependencies {
 
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'org.mockito:mockito-core:5.4.0' // Ensure this version or compatible
+
 }
 
 group 'com.example'
