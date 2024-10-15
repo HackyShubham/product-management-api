@@ -4,7 +4,6 @@ import com.example.product.dto.ProductDto;
 import com.example.product.service.ProductService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -49,7 +48,6 @@ public class ProductResource {
     // Update an existing product
     @PUT
     @Path("/{id}")
-    @Transactional
     public Uni<Response> updateProduct(@PathParam("id") Long id, ProductDto productDto) {
         return productService.updateProduct(id,productDto)
                 .onItem().transform(updatedProduct -> Response.ok(updatedProduct).build())
@@ -59,18 +57,25 @@ public class ProductResource {
     // Delete a product by ID
     @DELETE
     @Path("/{id}")
-    @Transactional
     public Uni<Response> deleteProduct(@PathParam("id") Long id) {
         return productService.deleteProduct(id)
                 .onItem().transform(v -> Response.noContent().build())
                 .onFailure().recoverWithItem(th -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
-    // Get all products sorted by price
-   /* @GET
-    @Path("/sorted")
-    public Uni<List<ProductDto>> getProductsSortedByPrice() {
-        return productService.getProductsSortedByPrice();
-    }*/
+    @GET
+    @Path("/{id}/check-stock")
+    public Uni<Response> checkStockAvailability(@PathParam("id") Long productId, @QueryParam("count") int count) {
+        return productService.checkStockAvailability(productId, count)
+                .onItem().transform(isAvailable -> isAvailable ?
+                        Response.ok("Stock is available").build() :
+                        Response.status(Response.Status.NOT_FOUND).entity("Insufficient stock").build());
+    }
+
+    @GET
+    @Path("/sorted-by-price")
+    public Uni<List<ProductDto>> getAllProductsSortedByPrice() {
+        return productService.getAllProductsSortedByPrice();
+    }
 }
 
