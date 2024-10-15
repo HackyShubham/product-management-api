@@ -58,3 +58,10 @@ INSERT INTO Product (id, name, description, price, quantity, sku) VALUES
 INSERT INTO Product (id, name, description, price, quantity, sku) VALUES
 (2160, 'Backpack with USB Charging Port', 'Stylish backpack with a built-in USB charging port for devices.', 59.99, 70, 'SKU-BP020');
 
+--Test cases data
+INSERT INTO Product (id, name, description, price, quantity, sku) VALUES
+(4000, 'Product A', 'Description A.', 59.99, 70, 'SKU-A');
+
+INSERT INTO Product (id, name, description, price, quantity, sku) VALUES
+(5000, 'Product B', 'Description B.', 59.99, 70, 'SKU-B');
+
