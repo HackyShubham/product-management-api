@@ -12,6 +12,8 @@ import jakarta.ws.rs.WebApplicationException;
 
 import java.util.List;
 
+import static jakarta.ws.rs.core.Response.Status.BAD_REQUEST;
+
 @ApplicationScoped
 public class ProductService {
 
@@ -24,11 +26,11 @@ public class ProductService {
     @WithSession
     public Uni<ProductDto> getProductById(Long id) {
         return productRepository.findById(id)
-                .onItem().invoke(product -> System.out.println("Fetched product: " + product))
                 .onItem().ifNotNull().transform(this::entityToDto)
                 .onItem().ifNull().failWith(() -> new WebApplicationException("Product not found", 404));
     }
 
+    @WithSession
     public Uni<List<ProductDto>> getAllProducts() {
         return productRepository.findAllProducts()
                 .onItem().transform(productMapper::toDtoList);
@@ -39,9 +41,24 @@ public class ProductService {
                 .onItem().transform(productMapper::toDtoList);
     }
 
-    public Uni<Void> createProduct(ProductDto ProductDto) {
-        Product product = productMapper.toEntity(ProductDto);
-        return productRepository.persistProduct(product);
+    public Uni<ProductDto> createProduct(ProductDto productDto) {
+        Uni<Product> p =productRepository.findBySku(productDto.getSku());
+        return productRepository.findBySku(productDto.getSku())
+                .onItem().transform(existingProduct -> {
+                    if (existingProduct != null) {
+                        // If the product exists, transform it to DTO
+                        throw new WebApplicationException("Product with SKU " + productDto.getSku() + " already exists", BAD_REQUEST);
+                    } else {
+                        Product newProduct = mapToEntity(productDto);
+
+                        // Persist the new product
+                        productRepository.persist(newProduct);
+
+                        // Return the DTO of the newly created product
+                        return entityToDto(newProduct);
+                    }
+                });
+
     }
 
     public Uni<ProductDto> updateProduct(Long id, ProductDto ProductDto) {
@@ -75,6 +92,7 @@ public class ProductService {
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
                 .quantity(productDTO.getQuantity())
+                .sku(productDTO.getSku())
                 .build();
     }
 
@@ -85,6 +103,7 @@ public class ProductService {
                 .description(product.getDescription())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
+                .sku(product.getSku())
                 .build();
     }
 

@@ -29,5 +29,9 @@ public class ProductRepository implements PanacheRepository<Product> {
     public Uni<List<Product>> findAllSortedByPrice() {
         return find("order by price asc").list();
     }
+
+    public Uni<Product> findBySku(String sku) {
+        return find("sku", sku).firstResult(); // Find product by SKU
+    }
 }
 

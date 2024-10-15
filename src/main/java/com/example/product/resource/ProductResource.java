@@ -1,7 +1,6 @@
 package com.example.product.resource;
 
 import com.example.product.dto.ProductDto;
-import com.example.product.entity.Product;
 import com.example.product.service.ProductService;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
@@ -11,6 +10,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+
+import static jakarta.ws.rs.core.Response.Status.CREATED;
+
 @Path("/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -34,9 +36,14 @@ public class ProductResource {
 
     // Create a new product
     @POST
-    @Transactional
-    public Uni<Void> createProduct(ProductDto ProductDto) {
-        return productService.createProduct(ProductDto);
+    //@WithTransaction
+    //@Transactional
+    public Uni<Response> createProduct(ProductDto productDto) {
+        return productService.createProduct(productDto)
+                .onItem().transform(productResponse -> Response
+                        .status(CREATED) // Set the response status to 201
+                        .entity(productResponse) // Set the response body
+                        .build());
     }
 
     // Update an existing product

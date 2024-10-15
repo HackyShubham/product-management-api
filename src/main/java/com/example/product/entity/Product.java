@@ -27,4 +27,7 @@ public class Product {
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = false,unique = true)
+    private String sku;
 }
